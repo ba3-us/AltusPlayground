@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  height: 100vh;
+  width: 100vw;
+}
+
+.container > div, .container > button {
+  flex: 1;
+}
+
+#run-button {
+  position: absolute;
+  height: 44px;
+  width: 100vw;
+}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Altus Playground</title>
+
+    <link href="altus/altus.css" rel="stylesheet">
+    <link href="playground.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="playground" class="container">
+      <div id="altus" class="map"></div>
+      <div id="editor">
+// http://b.tile.openstreetmap.org/{z}/{x}/{y}.png
+// http://otile1.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg
+// https://a.tiles.mapbox.com/v3/dxjacob.h43n70g0/{z}/{x}/{y}.png
+// http://tile.stamen.com/toner/{z}/{x}/{y}.png
+// http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg
+// http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg
+// http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png
+// https://a.tile.thunderforest.com/cycle/{z}/{x}/{y}.png
+// http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png
+// http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png
+
+//Internal name of map
+var mapName = "sample-map";
+var mapUrl = "https://a.tiles.mapbox.com/v4/dxjacob.ho6k3ag9/{z}/{x}/{y}.jpg?access_token=pk.eyJ1IjoiZHhqYWNvYiIsImEiOiJwYXotMmtVIn0.rvNzd7EZTKqynbx-9BQdtA";
+
+//Create a tile provider that will serve up the tiles
+var resourceManager = AltusUnified.scene.getResourceManager();
+var internetTileProvider = new AltusUnified.InternetTileProvider(resourceManager, mapName, mapUrl);
+
+//Create a map description and map object
+var mapDesc = AltusUnified.VirtualMap.defaultRasterMapDesc();
+internetMap = new AltusUnified.VirtualMap(mapName, mapDesc, internetTileProvider);
+
+//Add the new map
+AltusUnified.scene.addMap(internetMap);
+
+//Clean up
+mapDesc.delete();
+resourceManager.delete();
+internetTileProvider.delete();
+      </div>
+      <button type="button" name="Run" id="run-button">Run</button>
+    </div>
+
+    <script src="ace/ace.js" charset="utf-8"></script>
+    <script src="altus/altus.js" charset="utf-8"></script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js" charset="utf-8"></script>
+
+    <script type='text/javascript'>
+        var AltusUnified = new Altus(document.getElementById("altus"));
+        var editor = ace.edit("editor");
+        editor.getSession().setMode("ace/mode/javascript");
+
+        var mapUrl = "https://a.tiles.mapbox.com/v4/dxjacob.ho6k3ag9/{z}/{x}/{y}.jpg?access_token=pk.eyJ1IjoiZHhqYWNvYiIsImEiOiJwYXotMmtVIn0.rvNzd7EZTKqynbx-9BQdtA";
+        var internetMap;
+        var mapNum = 1;
+        var mapName = "sample-map";
+
+        function onAltusEngineReady() {
+            AltusUnified.scene.setLicenseKey('YOUR-LICENSE-KEY-HERE');
+            addInitialRasterLayer();
+        };
+
+        function addInitialRasterLayer() {
+          var resourceManager = AltusUnified.scene.getResourceManager();
+          var internetTileProvider = new AltusUnified.InternetTileProvider(resourceManager, mapName, mapUrl);
+          var mapDesc = AltusUnified.VirtualMap.defaultRasterMapDesc();
+          internetMap = new AltusUnified.VirtualMap(mapName, mapDesc, internetTileProvider);
+
+          AltusUnified.scene.addMap(internetMap);
+
+          mapDesc.delete();
+          resourceManager.delete();
+          internetTileProvider.delete();
+        }
+
+        $(document).ready(function() {
+          $('#run-button').click(function() {
+            if (internetMap) {
+              AltusUnified.scene.removeMap(internetMap, 1);
+            }
+
+            eval(editor.getValue())
+          });
+        });
+    </script>
+  </body>
+</html>
