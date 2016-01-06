@@ -14,20 +14,23 @@
     <div id="playground" class="container">
       <div id="altus" class="map"></div>
       <div id="editor">
-// http://b.tile.openstreetmap.org/{z}/{x}/{y}.png
-// http://otile1.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg
-// https://a.tiles.mapbox.com/v3/dxjacob.h43n70g0/{z}/{x}/{y}.png
-// http://tile.stamen.com/toner/{z}/{x}/{y}.png
-// http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg
-// http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg
-// http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png
-// https://a.tile.thunderforest.com/cycle/{z}/{x}/{y}.png
-// http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png
-// http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png
+var urls = [
+  "https://a.tiles.mapbox.com/v4/dxjacob.ho6k3ag9/{z}/{x}/{y}.jpg?access_token=pk.eyJ1IjoiZHhqYWNvYiIsImEiOiJwYXotMmtVIn0.rvNzd7EZTKqynbx-9BQdtA",
+  "http://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "http://otile1.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.jpg",
+  "https://a.tiles.mapbox.com/v3/dxjacob.h43n70g0/{z}/{x}/{y}.png",
+  "http://tile.stamen.com/toner/{z}/{x}/{y}.png",
+  "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg",
+  "http://tile.stamen.com/watercolor/{z}/{x}/{y}.jpg",
+  "http://a.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png",
+  "https://a.tile.thunderforest.com/cycle/{z}/{x}/{y}.png",
+  "http://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+  "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png",
+];
 
 //Internal name of map
 var mapName = "sample-map";
-var mapUrl = "https://a.tiles.mapbox.com/v4/dxjacob.ho6k3ag9/{z}/{x}/{y}.jpg?access_token=pk.eyJ1IjoiZHhqYWNvYiIsImEiOiJwYXotMmtVIn0.rvNzd7EZTKqynbx-9BQdtA";
+var mapUrl = urls[0];
 
 //Create a tile provider that will serve up the tiles
 var resourceManager = AltusUnified.scene.getResourceManager();
@@ -56,6 +59,14 @@ internetTileProvider.delete();
         var AltusUnified = new Altus(document.getElementById("altus"));
         var editor = ace.edit("editor");
         editor.getSession().setMode("ace/mode/javascript");
+        editor.commands.addCommand({
+          name: 'run',
+          bindKey: {win: 'Ctrl-Enter', mac: 'Command-Enter'},
+          exec: function(editor) {
+            runCode();
+          },
+          readOnly: true
+        })
 
         var mapUrl = "https://a.tiles.mapbox.com/v4/dxjacob.ho6k3ag9/{z}/{x}/{y}.jpg?access_token=pk.eyJ1IjoiZHhqYWNvYiIsImEiOiJwYXotMmtVIn0.rvNzd7EZTKqynbx-9BQdtA";
         var internetMap;
@@ -80,13 +91,18 @@ internetTileProvider.delete();
           internetTileProvider.delete();
         }
 
-        $(document).ready(function() {
-          $('#run-button').click(function() {
+        function runCode() {
             if (internetMap) {
               AltusUnified.scene.removeMap(internetMap, 1);
             }
 
-            eval(editor.getValue())
+            var code = new Function("'use strict';" + editor.getValue());
+            code();
+        }
+
+        $(document).ready(function() {
+          $('#run-button').click(function() {
+            runCode();
           });
         });
     </script>
